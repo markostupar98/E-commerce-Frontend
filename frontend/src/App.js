@@ -8,6 +8,7 @@ import {
 import Users from "./user/component/pages/Users";
 import NewProduct from "./products/pages/NewProduct";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
+import UserProducts from "./products/pages/UserProducts";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <main>
         <Switch>
           <Route path="/" exact component={Users} />
+          <Route path='/:userId/products' exact component={UserProducts} />
           <Route path="/products/new" component={NewProduct} exact />
           <Redirect to="/" />
         </Switch>
