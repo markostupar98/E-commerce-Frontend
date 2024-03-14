@@ -1,12 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import "./ProductItem.css";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
 import Modal from "../../shared/components/UIElements/Modal";
+import { AuthContext } from "../../shared/components/context/AuthContext";
 const ProductItem = (props) => {
+  const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
   const openMap = () => setShowMap(true);
   const closeMap = () => setShowMap(false);
+  const showDeleteWarning = () => {
+    setShowConfirmModal(true);
+  };
+  const cancelDeleteWarning = () => {
+    setShowConfirmModal(false);
+  };
+  const confirmDelete = () => {
+    setShowConfirmModal(false);
+    console.log("Deleting");
+  };
 
   return (
     <React.Fragment>
@@ -22,7 +35,24 @@ const ProductItem = (props) => {
           <h2>Product detail</h2>
         </div>
       </Modal>
-
+      <Modal
+        show={showConfirmModal}
+        onCancel={cancelDeleteWarning}
+        header="Are you sure"
+        footerClass="place-item__modal-actions"
+        footer={
+          <React.Fragment>
+            <Button inverse onClick={cancelDeleteWarning}>
+              Cancel
+            </Button>
+            <Button danger onClick={confirmDelete}>
+              Delete
+            </Button>
+          </React.Fragment>
+        }
+      >
+        <p>Do you want to proceed ?</p>
+      </Modal>
       <li className="place-item">
         <Card className="place-item__content">
           <div className="place-item__image">
@@ -37,8 +67,14 @@ const ProductItem = (props) => {
             <Button onClick={openMap} inverse>
               View on map
             </Button>
-            <Button to={`/products/${props.id}`}>Edit</Button>
-            <Button danger>Delete</Button>
+            {auth.isLoggedIn && (
+              <Button to={`/products/${props.id}`}>Edit</Button>
+            )}
+            {auth.isLoggedIn && (
+              <Button danger onClick={showDeleteWarning}>
+                Delete
+              </Button>
+            )}
           </div>
         </Card>
       </li>

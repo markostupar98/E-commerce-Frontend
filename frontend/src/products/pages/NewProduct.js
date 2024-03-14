@@ -1,39 +1,16 @@
-import React, { useCallback, useReducer } from "react";
+import React from "react";
 import { Input } from "../../shared/components/FormElements/Input";
 import Button from "../../shared/components/FormElements/Button";
+import {useForm} from "../../shared/components/hooks/formHook";
 import "../components/ProductForm.css";
 import {
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../shared/util/Validators";
 
-const formReducer = (state, action) => {
-  switch (action.type) {
-    case "INPUT CHANGE":
-      let formIsValid = true;
-      for (const inputId in state.inputIds) {
-        if (inputId === action.inputId) {
-          formIsValid = formIsValid && action.isValid;
-        } else {
-          formIsValid = formIsValid && state.inputs[inputId].isValid;
-        }
-      }
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.inputId]: { value: action.value, isValid: action.isValid },
-        },
-        isValid: formIsValid,
-      };
-
-    default:
-      return state;
-  }
-};
 const NewProduct = () => {
-  const [formState, dispatch] = useReducer(formReducer, {
-    inputs: {
+  const [formState, inputChange] = useForm(
+    {
       title: {
         value: "",
         isValid: false,
@@ -47,17 +24,8 @@ const NewProduct = () => {
         isValid: false,
       },
     },
-    isValid: false,
-  });
-
-  const inputChange = useCallback((id, value, isValid) => {
-    dispatch({
-      type: "INPUT CHANGE",
-      value: value,
-      isValid: isValid,
-      inputId: id,
-    });
-  }, []);
+    false
+  );
 
   const addProductSubmit = (event) => {
     event.preventDefault();
@@ -81,7 +49,7 @@ const NewProduct = () => {
         type="Description"
         label="Description"
         validators={[VALIDATOR_MINLENGTH(5)]}
-        errorText="Please enter a valid description al least 5 charcacters"
+        errorText="Please enter a valid description at least 5 characters"
         onInput={inputChange}
       />
       <Input
@@ -98,4 +66,6 @@ const NewProduct = () => {
     </form>
   );
 };
+
 export default NewProduct;
+

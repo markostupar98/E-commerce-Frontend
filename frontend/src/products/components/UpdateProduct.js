@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
 import { Input } from "../../shared/components/FormElements/Input";
+import { useForm } from "../../shared/components/hooks/formHook";
 import Button from "../../shared/components/FormElements/Button";
+import Card from "../../shared/components/UIElements/Card";
 import "./ProductForm.css";
 import {
   VALIDATOR_REQUIRE,
@@ -38,41 +40,91 @@ const DUMMY_PRODUCTS = [
 ];
 
 export const UpdateProduct = () => {
+  const [loading, setLoading] = useState(true);
   const productId = useParams().productId;
+
+  const [formState, inputChange, setFormData] = useForm(
+    {
+      title: {
+        value: "",
+        isValid: false,
+      },
+      description: {
+        value: "",
+        isValid: false,
+      },
+    },
+    false
+  );
   const product = DUMMY_PRODUCTS.find((p) => p.id === productId);
+
+  useEffect(() => {
+    if (product) {
+      setFormData({
+        title: {
+          value: product.title,
+          isValid: true,
+        },
+        description: {
+          value: product.description,
+          isValid: true,
+        },
+      });
+    }
+    setLoading(false);
+  }, [setFormData, product]);
+
+  const productSubmitUpdate = (event) => {
+    event.preventDefault();
+    console.log(formState.inputs);
+  };
+
   if (!product) {
     return (
       <div className="center">
-        <h2>Could not find product</h2>
+        <Card>
+          <h2>Could not find product</h2>
+        </Card>
       </div>
     );
   }
+
+  if (loading) {
+    return (
+      <div className="center">
+        <h2>Loading</h2>
+      </div>
+    );
+  }
+
   return (
-    <form className="place-form">
-      <Input
-        id="title"
-        element="input"
-        type="text"
-        label="Title"
-        validators={[VALIDATOR_REQUIRE]}
-        errorText="Please enter a valid title"
-        onInput={() => {}}
-        value={product.title}
-        valid={true}
-      />
-      <Input
-        id="description"
-        element="textare"
-        label="Description"
-        validators={[VALIDATOR_MINLENGTH(5)]}
-        errorText="Please enter a valid description (min 5 char)"
-        onInput={() => {}}
-        value={product.description}
-        valid={true}
-      />
-      <Button type="submit" disabled={true}>
-        Update product
-      </Button>
-    </form>
+    formState.inputs.title.value && (
+      <form className="place-form" onSubmit={productSubmitUpdate}>
+        <Input
+          id="title"
+          element="input"
+          type="text"
+          label="Title"
+          validators={[VALIDATOR_REQUIRE]}
+          errorText="Please enter a valid title"
+          onInput={inputChange}
+          initialValue={formState.inputs.title.value}
+          initialValid={formState.inputs.title.isValid}
+        />
+        <Input
+          id="description"
+          element="textare"
+          label="Description"
+          validators={[VALIDATOR_MINLENGTH(5)]}
+          errorText="Please enter a valid description (min 5 char)"
+          onInput={inputChange}
+          initialValue={formState.inputs.description.value}
+          initialValid={formState.inputs.description.isValid}
+        />
+        <Button type="submit" disabled={!formState.isValid}>
+          Update product
+        </Button>
+      </form>
+    )
   );
 };
