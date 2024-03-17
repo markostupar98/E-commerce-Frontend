@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import axios from "axios";
 import Card from "../../../shared/components/UIElements/Card";
 import "./Auth.css";
 import { Input } from "../../../shared/components/FormElements/Input";
@@ -28,10 +29,27 @@ export const Auth = () => {
     false
   );
 
-  const authSubmit = (event) => {
+  const authSubmit = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
-    auth.login()
+
+    if (isLoginMode) {
+    } else {
+      try {
+        const response = await axios.post(
+          "http://localhost:5000/api/users/signup",
+          {
+            name: formState.inputs.name.value,
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }
+        );
+        console.log(response);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    auth.login();
   };
 
   const swithMode = () => {
