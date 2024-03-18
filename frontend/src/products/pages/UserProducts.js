@@ -1,41 +1,45 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ProductsList } from "../components/ProductsList";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
-
-const DUMMY_PRODUCTS = [
-  {
-    id: "p1",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg",
-    address: "20 W 34th St, New York, NY 10001",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    imageUrl:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/NYC_Empire_State_Building.jpg/640px-NYC_Empire_State_Building.jpg",
-    address: "20 W 34th St, New York, NY 10001",
-    location: {
-      lat: 40.7484405,
-      lng: -73.9878584,
-    },
-    creator: "u2",
-  },
-];
+import { useFetchHook } from "../../shared/components/hooks/fetchHook";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
 
 const UserProducts = () => {
+  const [loadedProducts, setLoadedProducts] = useState();
+  const { isLoading, error, sendRequest, clearError } = useFetchHook();
   const userId = useParams().userId;
-  const loadedProducts = DUMMY_PRODUCTS.filter(
-    (product) => product.creator === userId
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const responseData = await sendRequest(
+          `http://localhost:5000/api/pro  ducts/user/${userId}`
+        );
+        setLoadedProducts(responseData.products);
+      } catch (err) {}
+    };
+    fetchProducts();
+  }, [sendRequest, userId]);
+
+  const productDelete = (deletedProductId) => {
+    setLoadedProducts((prevProducts) =>
+      prevProducts.filter((product) => product.id !== deletedProductId)
+    );
+  };
+
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedProducts && (
+        <ProductsList items={loadedProducts} onDeleteProduct={productDelete} />
+      )}
+    </React.Fragment>
   );
-  return <ProductsList items={loadedProducts} />;
 };
 export default UserProducts;

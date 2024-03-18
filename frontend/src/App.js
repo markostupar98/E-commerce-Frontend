@@ -10,16 +10,19 @@ import NewProduct from "./products/pages/NewProduct";
 import MainNavigation from "./shared/components/Navigation/MainNavigation";
 import UserProducts from "./products/pages/UserProducts";
 import { UpdateProduct } from "./products/components/UpdateProduct";
-import { Auth } from "./user/component/pages/Auth";
+import { Auth } from "./user/component/pages/Auth.js";
 import { AuthContext } from "./shared/components/context/AuthContext";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const login = useCallback(() => {
+  const [userId, setUserId] = useState();
+  const login = useCallback((userId) => {
     setIsLoggedIn(true);
+    setUserId(userId);
   }, []);
   const logout = useCallback(() => {
     setIsLoggedIn(false);
+    setUserId(null);
   }, []);
 
   let routes;
@@ -38,7 +41,7 @@ function App() {
       <Switch>
         <Route path="/" exact component={Users} />
         <Route path="/:userId/products" exact component={UserProducts} />
-        <Route path="/auth" component={Auth} exact />
+        <Route path="/auth" component={Auth} />
         <Redirect to="/auth" />
       </Switch>
     );
@@ -46,7 +49,7 @@ function App() {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
+      value={{ isLoggedIn: isLoggedIn, userId:userId, login: login, logout: logout }}
     >
       <Router>
         <MainNavigation />

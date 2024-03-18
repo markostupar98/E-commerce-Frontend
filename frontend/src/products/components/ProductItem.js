@@ -2,27 +2,42 @@ import React, { useState, useContext } from "react";
 import "./ProductItem.css";
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/FormElements/Button";
+import ErrorModal from "../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { useFetchHook } from "../../shared/components/hooks/fetchHook";
 import Modal from "../../shared/components/UIElements/Modal";
 import { AuthContext } from "../../shared/components/context/AuthContext";
+
 const ProductItem = (props) => {
+  const { isLoading, error, sendRequest, clearError } = useFetchHook();
   const auth = useContext(AuthContext);
   const [showMap, setShowMap] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const openMap = () => setShowMap(true);
   const closeMap = () => setShowMap(false);
+
   const showDeleteWarning = () => {
     setShowConfirmModal(true);
   };
+
   const cancelDeleteWarning = () => {
     setShowConfirmModal(false);
   };
-  const confirmDelete = () => {
+
+  const confirmDelete = async () => {
     setShowConfirmModal(false);
-    console.log("Deleting");
+    try {
+      await sendRequest(
+        `http://localhost:5000/api/products/${props.id}`,
+        "DELETE"
+      );
+      props.onDelete(props.id);
+    } catch (err) {}
   };
 
   return (
     <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
       <Modal
         show={showMap}
         onCancel={closeMap}
@@ -55,6 +70,7 @@ const ProductItem = (props) => {
       </Modal>
       <li className="place-item">
         <Card className="place-item__content">
+          {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
             <img src={props.image} alt={props.title} />
           </div>

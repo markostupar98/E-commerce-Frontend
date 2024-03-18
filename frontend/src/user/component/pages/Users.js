@@ -1,16 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UsersList from "../UsersList";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
+import { useFetchHook } from "../../../shared/components/hooks/fetchHook";
 
 const Users = () => {
-  const USERS = [
-    {
-      id: "u1",
-      name: "Marko S",
-      image:
-        "https://ps.w.org/user-avatar-reloaded/assets/icon-256x256.png?rev=2540745",
-      products: 3,
-    },
-  ];
-  return <UsersList items={USERS} />;
+  const { isLoading, error, sendRequest, clearError } = useFetchHook();
+  const [loadedUsers, setLoadedUsers] = useState();
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/users"
+        );
+
+        setLoadedUsers(responseData.users);
+      } catch (err) {}
+    };
+    fetchUsers();
+  }, [sendRequest]);
+
+  return (
+    <React.Fragment>
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && (
+        <div className="center">
+          <LoadingSpinner />
+        </div>
+      )}
+      {!isLoading && loadedUsers && <UsersList items={loadedUsers} />}
+    </React.Fragment>
+  );
 };
+
 export default Users;

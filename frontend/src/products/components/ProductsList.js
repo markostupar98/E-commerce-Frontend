@@ -21,12 +21,13 @@ export const ProductsList = (props) => {
         <ProductItem
           key={product.id}
           id={product.id}
-          image={product.imageUrl}
+          image={product.image}
           title={product.title}
           description={product.description}
           address={product.address}
           creatorId={product.creator}
           coordinates={product.location}
+          onDelete={props.onDeleteProduct}
         />
       ))}
     </ul>
