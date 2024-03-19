@@ -9,7 +9,7 @@ export const ProductsList = (props) => {
     return (
       <div className="place-list center">
         <Card>
-          <h2>No places found</h2>
+          <h2>No products found</h2>
           <Button to="/products/new">Share place</Button>
         </Card>
       </div>

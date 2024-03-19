@@ -30,7 +30,7 @@ function App() {
     routes = (
       <Switch>
         <Route path="/" exact component={Users} />
-        <Route path="/:userId/products" exact component={UserProducts} />
+        <Route path="/:userId/products" exact render={(props) => <UserProducts {...props} userId={userId} />} />
         <Route path="/products/new" component={NewProduct} exact />
         <Route path="/products/:productId" component={UpdateProduct} />
         <Redirect to="/" />
@@ -49,7 +49,12 @@ function App() {
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn: isLoggedIn, userId:userId, login: login, logout: logout }}
+      value={{
+        isLoggedIn: isLoggedIn,
+        userId: userId,
+        login: login,
+        logout: logout,
+      }}
     >
       <Router>
         <MainNavigation />

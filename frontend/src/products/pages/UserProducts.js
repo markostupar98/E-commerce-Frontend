@@ -14,7 +14,7 @@ const UserProducts = () => {
     const fetchProducts = async () => {
       try {
         const responseData = await sendRequest(
-          `http://localhost:5000/api/pro  ducts/user/${userId}`
+          `http://localhost:5000/api/products/user/${userId}`
         );
         setLoadedProducts(responseData.products);
       } catch (err) {}

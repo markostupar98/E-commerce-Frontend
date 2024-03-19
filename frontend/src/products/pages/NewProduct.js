@@ -4,6 +4,7 @@ import Button from "../../shared/components/FormElements/Button";
 import ErrorModal from "../../shared/components/UIElements/ErrorModal";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import LoadingSpinner from "../../shared/components/UIElements/LoadingSpinner";
+import { ImageUpload } from "../../shared/components/FormElements/ImageUpload";
 import { useForm } from "../../shared/components/hooks/formHook";
 import { useFetchHook } from "../../shared/components/hooks/fetchHook";
 import { AuthContext } from "../../shared/components/context/AuthContext";
@@ -30,6 +31,10 @@ const NewProduct = () => {
         value: "",
         isValid: false,
       },
+      image: {
+        value: null,
+        isValid: false,
+      },
     },
     false
   );
@@ -40,21 +45,17 @@ const NewProduct = () => {
     event.preventDefault();
 
     try {
-      await sendRequest(
-        "http://localhost:5000/api/products",
-        "POST",
-        JSON.stringify({
-          title: formState.inputs.title.value,
-          description: formState.inputs.description.value,
-          address: formState.inputs.address.value,
-          creator: auth.userId,
-        }),
-        { "Content-Type": "application/json" }
-      );
-      history.push('/');
+      const formData = new FormData();
+      formData.append("title", formState.inputs.title.value);
+      formData.append("description", formState.inputs.description.value);
+      formData.append("address", formState.inputs.address.value);
+      formData.append("creator", auth.userId);
+      formData.append("image", formState.inputs.image.value);
+
+      await sendRequest("http://localhost:5000/api/products", "POST", formData);
+      history.push("/");
     } catch (err) {}
 
-    // Still need to add more logic console.log(formState.inputs);
   };
 
   return (
@@ -76,8 +77,8 @@ const NewProduct = () => {
           element="textarea"
           type="Description"
           label="Description"
-          validators={[VALIDATOR_MINLENGTH(5)]}
-          errorText="Please enter a valid description at least 5 characters"
+          validators={[VALIDATOR_MINLENGTH(6)]}
+          errorText="Please enter a valid description at least 6 characters"
           onInput={inputChange}
         />
         <Input
@@ -88,10 +89,15 @@ const NewProduct = () => {
           errorText="Please enter address"
           onInput={inputChange}
         />
+        <ImageUpload
+          id="image"
+          onInput={inputChange}
+          errorText="Please provide an image"
+        />
         <Button type="submit" disabled={!formState.isValid}>
           Add product
         </Button>
-      </form>{" "}
+      </form>
     </React.Fragment>
   );
 };

@@ -42,7 +42,7 @@ export const UpdateProduct = () => {
     const fetchProduct = async () => {
       try {
         const responseData = await sendRequest(
-          `http:// localhost:5000/api/products/${productId}`
+          `http://localhost:5000/api/products/${productId}`
         );
         setLoadedProduct(responseData.product);
         setFormData(
@@ -113,7 +113,7 @@ export const UpdateProduct = () => {
             validators={[VALIDATOR_REQUIRE]}
             errorText="Please enter a valid title"
             onInput={inputChange}
-            initialValue={loadedProduct}
+            initialValue={loadedProduct.title}
             initialValid={true}
           />
           <Input
@@ -123,7 +123,7 @@ export const UpdateProduct = () => {
             validators={[VALIDATOR_MINLENGTH(5)]}
             errorText="Please enter a valid description (min 5 char)"
             onInput={inputChange}
-            initialValue={loadedProduct}
+            initialValue={loadedProduct.description}
             initialValid={true}
           />
           <Button type="submit" disabled={!formState.isValid}>

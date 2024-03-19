@@ -11,10 +11,10 @@ import { AuthContext } from "../../shared/components/context/AuthContext";
 const ProductItem = (props) => {
   const { isLoading, error, sendRequest, clearError } = useFetchHook();
   const auth = useContext(AuthContext);
-  const [showMap, setShowMap] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const openMap = () => setShowMap(true);
-  const closeMap = () => setShowMap(false);
+  const openDetails = () => setShowDetails(true);
+  const closeDetails = () => setShowDetails(false);
 
   const showDeleteWarning = () => {
     setShowConfirmModal(true);
@@ -39,12 +39,12 @@ const ProductItem = (props) => {
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       <Modal
-        show={showMap}
-        onCancel={closeMap}
-        header={props.address}
+        show={showDetails}
+        onCancel={closeDetails}
+        header={props.address && props.title && props.description}
         contentClass="place-item__modal-content"
         footerClass="place-item__modal-actions"
-        footer={<Button onClick={closeMap}>Close</Button>}
+        footer={<Button onClick={closeDetails}>Close</Button>}
       >
         <div className="map-container">
           <h2>Product detail</h2>
@@ -72,7 +72,7 @@ const ProductItem = (props) => {
         <Card className="place-item__content">
           {isLoading && <LoadingSpinner asOverlay />}
           <div className="place-item__image">
-            <img src={props.image} alt={props.title} />
+            <img src={`http://localhost:5000/${props.image}`} alt={props.title} />
           </div>
           <div className="place-item__info">
             <h2>{props.title}</h2>
@@ -80,13 +80,13 @@ const ProductItem = (props) => {
             <p>{props.description}</p>
           </div>
           <div className="place-item__actions">
-            <Button onClick={openMap} inverse>
+            <Button onClick={openDetails} inverse>
               View on map
             </Button>
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <Button to={`/products/${props.id}`}>Edit</Button>
             )}
-            {auth.isLoggedIn && (
+            {auth.userId === props.creatorId && (
               <Button danger onClick={showDeleteWarning}>
                 Delete
               </Button>

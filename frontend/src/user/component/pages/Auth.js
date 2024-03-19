@@ -4,6 +4,7 @@ import Card from "../../../shared/components/UIElements/Card";
 import "./Auth.css";
 import { Input } from "../../../shared/components/FormElements/Input";
 import Button from "../../../shared/components/FormElements/Button";
+import { ImageUpload } from "../../../shared/components/FormElements/ImageUpload";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal";
 import { useFetchHook } from "../../../shared/components/hooks/fetchHook";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner";
@@ -62,6 +63,7 @@ export const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          image: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -71,6 +73,10 @@ export const Auth = () => {
           ...formState.inputs,
           name: {
             value: "",
+            isValid: false,
+          },
+          image: {
+            value: null,
             isValid: false,
           },
         },
@@ -100,17 +106,16 @@ export const Auth = () => {
       } catch (err) {}
     } else {
       try {
+        const formData = new FormData();
+        formData.append("email", formState.inputs.email.value);
+        formData.append("name", formState.inputs.name.value);
+        formData.append("password", formState.inputs.password.value);
+        formData.append("image", formState.inputs.image.value);
+
         const responseData = await sendRequest(
           "http://localhost:5000/api/users/signup",
           "POST",
-          JSON.stringify({
-            name: formState.inputs.name.value,
-            email: formState.inputs.email.value,
-            password: formState.inputs.password.value,
-          }),
-          {
-            "Content-Type": "application/json",
-          }
+          formData
         );
 
         auth.login(responseData.user.id);
@@ -137,6 +142,16 @@ export const Auth = () => {
               onInput={inputChange}
             />
           )}
+
+          {!isLoginMode && (
+            <ImageUpload
+              center
+              id="image"
+              onInput={inputChange}
+              errorText="Please provide an image"
+            />
+          )}
+
           <Input
             id="email"
             element="input"
@@ -151,7 +166,7 @@ export const Auth = () => {
             element="input"
             type="password"
             label="Password"
-            validators={[VALIDATOR_MINLENGTH(5)]}
+            validators={[VALIDATOR_MINLENGTH(6)]}
             errorText="Please enter valid password , at least 5 char long"
             onInput={inputChange}
           />
