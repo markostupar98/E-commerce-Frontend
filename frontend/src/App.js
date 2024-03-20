@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -14,23 +14,31 @@ import { Auth } from "./user/component/pages/Auth.js";
 import { AuthContext } from "./shared/components/context/AuthContext";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(false);
   const [userId, setUserId] = useState();
-  const login = useCallback((userId) => {
-    setIsLoggedIn(true);
+
+  useEffect(() => {}, []);
+
+  const login = useCallback((userId, token) => {
+    setToken(token);
+    localStorage.setItem("userData", JSON.stringify({ userId, token }));
     setUserId(userId);
   }, []);
   const logout = useCallback(() => {
-    setIsLoggedIn(false);
+    setToken(null);
     setUserId(null);
   }, []);
 
   let routes;
-  if (isLoggedIn) {
+  if (token) {
     routes = (
       <Switch>
         <Route path="/" exact component={Users} />
-        <Route path="/:userId/products" exact render={(props) => <UserProducts {...props} userId={userId} />} />
+        <Route
+          path="/:userId/products"
+          exact
+          render={(props) => <UserProducts {...props} userId={userId} />}
+        />
         <Route path="/products/new" component={NewProduct} exact />
         <Route path="/products/:productId" component={UpdateProduct} />
         <Redirect to="/" />
@@ -50,7 +58,8 @@ function App() {
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn: isLoggedIn,
+        isLoggedIn: !!token,
+        token: token,
         userId: userId,
         login: login,
         logout: logout,
