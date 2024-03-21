@@ -14,7 +14,7 @@ const UserProducts = () => {
     const fetchProducts = async () => {
       try {
         const responseData = await sendRequest(
-          `http://localhost:5000/api/products/user/${userId}`
+          `${process.env.REACT_APP_BACKEND_URL}/products/user/${userId}`
         );
         setLoadedProducts(responseData.products);
       } catch (err) {}

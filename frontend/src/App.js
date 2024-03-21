@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -12,22 +12,12 @@ import UserProducts from "./products/pages/UserProducts";
 import { UpdateProduct } from "./products/components/UpdateProduct";
 import { Auth } from "./user/component/pages/Auth.js";
 import { AuthContext } from "./shared/components/context/AuthContext";
+import { useAuth } from "./shared/components/hooks/authHook.js";
+import Footer from "./shared/components/Navigation/Footer.js";
 
 function App() {
-  const [token, setToken] = useState(false);
-  const [userId, setUserId] = useState();
-
-  useEffect(() => {}, []);
-
-  const login = useCallback((userId, token) => {
-    setToken(token);
-    localStorage.setItem("userData", JSON.stringify({ userId, token }));
-    setUserId(userId);
-  }, []);
-  const logout = useCallback(() => {
-    setToken(null);
-    setUserId(null);
-  }, []);
+  const { token, login, logout, userId } = useAuth();
+  // Routes...
 
   let routes;
   if (token) {
@@ -68,6 +58,7 @@ function App() {
       <Router>
         <MainNavigation />
         <main>{routes}</main>
+        <Footer />
       </Router>
     </AuthContext.Provider>
   );

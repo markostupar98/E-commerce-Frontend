@@ -42,7 +42,7 @@ export const UpdateProduct = () => {
     const fetchProduct = async () => {
       try {
         const responseData = await sendRequest(
-          `http://localhost:5000/api/products/${productId}`
+          `${process.env.REACT_APP_BACKEND_URL}/products/${productId}`
         );
         setLoadedProduct(responseData.product);
         setFormData(
@@ -68,7 +68,7 @@ export const UpdateProduct = () => {
     event.preventDefault();
     try {
       await sendRequest(
-        `http://localhost:5000/api/products/${productId}`,
+        `${process.env.REACT_APP_BACKEND_URL}/products/${productId}`,
         "PATCH",
         JSON.stringify({
           title: formState.inputs.title.value,
